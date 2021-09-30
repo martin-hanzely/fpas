@@ -10,7 +10,7 @@ class ItemBase(BaseModel): ...
 class ItemCreate(ItemBase):
     name: str
     description: Optional[str] = None
-    is_active: Optional[bool] = True
+    is_active: Optional[bool] = None
 
 
 class ItemUpdate(ItemBase):
