@@ -38,6 +38,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     async def update(self, db: AsyncSession, *, id: Any, obj: UpdateSchemaType) -> ModelType:
         cursor = await db.execute(select(self._model).where(self._model.id == id))
+        # raises exception if number of results is not equal to one
         db_obj = cursor.scalar_one()
         obj_dict: dict = jsonable_encoder(obj, exclude_unset=True)
         for k, v in obj_dict.items():
@@ -48,6 +49,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     async def delete(self, db: AsyncSession, *, id: int) -> ModelType:
         cursor = await db.execute(select(self._model).where(self._model.id == id))
+        # raises exception if number of results is not equal to one
         db_obj = cursor.scalar_one()
         db.sync_session.delete(db_obj)  # FIXME async ORM .delete() is not working here
         await db.commit()
