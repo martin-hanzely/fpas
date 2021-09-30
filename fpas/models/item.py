@@ -12,7 +12,7 @@ MAX_STRING_LENGTH = 64
 
 
 class Item(Base):
-    name: str = Column(String(length=MAX_STRING_LENGTH), nullable=False)
+    name: str = Column(String(length=MAX_STRING_LENGTH), unique=True, nullable=False)
     description: Optional[str] = Column(Text)
     is_active: bool = Column(Boolean, server_default=expression.true(), nullable=False)
     created_timestamp: datetime.datetime = Column(DateTime, server_default=utcnow())
