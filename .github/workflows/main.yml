@@ -39,6 +39,6 @@ jobs:
           tox -e mypy
       - name: Test with pytest
         env:
-          DB_CONNECTION: postgresql://postgres:postgres@localhost/postgres
+          POSTGRES_TEST_DSN: postgresql://postgres:postgres@localhost/postgres
         run: |
           tox
