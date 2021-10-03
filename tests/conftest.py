@@ -1,47 +1,45 @@
-import os
+import asyncio
 from typing import AsyncGenerator, Generator
 
 import pytest
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import AsyncClient
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from fpas.db.base import Base
-from fpas.db.utils import async_postgres_dsn
-
-
-POSTGRES_TEST_DSN = os.getenv(
-    "POSTGRES_TEST_DSN", default="postgresql://postgres:postgres@localhost:5432/fpas_test"
-)
+from fpas.db.session import async_engine, session_factory
 
 
 @pytest.fixture(scope="session", autouse=True)
 def migration() -> Generator[None, None, None]:
-    engine = create_engine(POSTGRES_TEST_DSN, echo=True)
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
+    import alembic.config
+
+    alembic.config.main(argv=["upgrade", "head"])
     yield
-    Base.metadata.drop_all(engine)
+    alembic.config.main(argv=["downgrade", "base"])
+
+
+@pytest.fixture(scope="session")
+def event_loop(request):
+    """
+    Redefined event_loop fixture for pytest-asyncio to support session scoped coroutines.
+    """
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest.fixture
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async_engine = create_async_engine(async_postgres_dsn(POSTGRES_TEST_DSN), echo=True)
-    session_factory = sessionmaker(class_=AsyncSession, autoflush=False, autocommit=False)
+    async with async_engine.connect() as connection:
+        transaction = await connection.begin()
+        session: AsyncSession = session_factory(bind=connection)
+        await connection.begin_nested()
 
-    connection = await async_engine.connect()
-    trans = await connection.begin()
-    session: AsyncSession = session_factory(bind=connection)
-    await connection.begin_nested()
+        yield session
 
-    yield session
-
-    await session.close()
-    await trans.rollback()
-    await connection.close()
+        await session.close()
+        await transaction.rollback()
 
 
 @pytest.fixture
