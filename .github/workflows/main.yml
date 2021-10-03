@@ -2,9 +2,6 @@ name: Tests
 
 on: [push]
 
-env:
-  POSTGRES_DSN: "postgresql://fpas:fpas@postgres:5432/fpas"
-
 jobs:
   build:
 
@@ -37,12 +34,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox
-      - name: Lint with flake8
+      - name: Test with pytest
+        env:
+          POSTGRES_DSN: postgresql://fpas:fpas@postgres:5432/fpas
         run: |
-          tox -e flake8
+          tox
       - name: Lint with mypy
         run: |
           tox -e mypy
-      - name: Test with pytest
+      - name: Lint with flake8
         run: |
-          tox
+          tox -e flake8
