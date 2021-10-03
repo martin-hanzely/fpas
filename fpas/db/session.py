@@ -9,4 +9,4 @@ ASYNC_POSTGRES_DSN = async_postgres_dsn(settings.POSTGRES_DSN)
 
 async_engine = create_async_engine(ASYNC_POSTGRES_DSN, echo=settings.DEBUG)
 
-AsyncSessionLocal = sessionmaker(bind=async_engine, class_=AsyncSession, autoflush=False)
+session_factory = sessionmaker(bind=async_engine, class_=AsyncSession, autoflush=False)

@@ -10,4 +10,4 @@ class Base:
     def __tablename__(cls) -> Mapped[str]:
         return cls.__name__.lower()
 
-    id: int = Column(Integer, primary_key=True)
+    id: int = Column(Integer, primary_key=True)  # use Integer id as primary key by default

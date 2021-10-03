@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseSettings
 
-
 # avoid mypy type error with litteral string assignment
 if TYPE_CHECKING:
     AnyHttpUrl = str
