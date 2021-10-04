@@ -2,6 +2,9 @@ name: Tests
 
 on: [push]
 
+env:
+  POSTGRES_DSN: postgresql://fpas:fpas@localhost:5432/fpas
+
 jobs:
   build:
 
@@ -35,8 +38,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox
       - name: Test with pytest
-        env:
-          POSTGRES_DSN: postgresql://fpas:fpas@localhost:5432/fpas
         run: |
           tox
       - name: Lint with mypy
