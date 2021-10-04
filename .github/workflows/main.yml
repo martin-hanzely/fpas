@@ -36,7 +36,7 @@ jobs:
           pip install tox
       - name: Test with pytest
         env:
-          POSTGRES_DSN: postgresql://fpas:fpas@postgres:5432/fpas
+          POSTGRES_DSN: postgresql://fpas:fpas@localhost:5432/fpas
         run: |
           tox
       - name: Lint with mypy
