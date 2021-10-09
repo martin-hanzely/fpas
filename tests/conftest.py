@@ -7,7 +7,10 @@ from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from fpas import crud
+from fpas.models.item import Item
 from fpas.db.session import async_engine, session_factory
+from fpas.schemas.item import ItemCreate
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -62,3 +65,8 @@ async def initialized_app(app: FastAPI) -> AsyncGenerator[FastAPI, None]:
 async def client(initialized_app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(app=initialized_app, base_url="http://testserver") as client:
         yield client
+
+
+@pytest.fixture
+async def test_item(get_db: AsyncSession) -> Item:
+    return await crud.item.create(get_db, obj=ItemCreate(name="Test Item"))
