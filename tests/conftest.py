@@ -44,9 +44,11 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 @pytest.fixture
 def app() -> FastAPI:
+    from fpas.api.deps import get_db as get_db_dependency
     from fpas.main import get_app
 
     app = get_app()
+    app.dependency_overrides[get_db_dependency] = get_db.__wrapped__  # use unwrapped get_db fixture
     return app
 
 
