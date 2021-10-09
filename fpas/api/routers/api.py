@@ -1,10 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+from fpas.api.routers.items import router as items_router
 from fpas.core.conf import settings
-
-
-router = APIRouter()
 
 
 class RootResponseMessage(BaseModel):
@@ -12,6 +10,12 @@ class RootResponseMessage(BaseModel):
     version: str = settings.VERSION
 
 
+router = APIRouter()
+
+
 @router.get("/", response_model=RootResponseMessage)
 async def root():
     return RootResponseMessage()
+
+
+router.include_router(items_router, prefix="/items", tags=["items"])
