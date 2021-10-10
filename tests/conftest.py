@@ -6,6 +6,7 @@ from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio.engine import AsyncConnection
 
 from fpas import crud
 from fpas.models.item import Item
@@ -33,25 +34,35 @@ def event_loop(request):
 
 
 @pytest.fixture
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def db_connection() -> AsyncGenerator[AsyncConnection, None]:
+    """
+    Common cached transaction for database session fixture and app dependency override.
+    """
     async with async_engine.connect() as connection:
         transaction = await connection.begin()
-        session: AsyncSession = session_factory(bind=connection)
-        await connection.begin_nested()
-
-        yield session
-
-        await session.close()
+        yield connection
         await transaction.rollback()
 
 
 @pytest.fixture
-def app() -> FastAPI:
-    from fpas.api.deps import get_db as get_db_dependency
+async def get_db(db_connection: AsyncConnection) -> AsyncGenerator[AsyncSession, None]:
+    session: AsyncSession = session_factory(bind=db_connection)
+    yield session
+    await session.close()
+
+
+@pytest.fixture
+def app(db_connection: AsyncConnection) -> FastAPI:
+    from fpas.api.deps import get_db
     from fpas.main import get_app
 
+    async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
+        session: AsyncSession = session_factory(bind=db_connection)
+        yield session
+        await session.close()
+
     app = get_app()
-    app.dependency_overrides[get_db_dependency] = get_db.__wrapped__  # use unwrapped get_db fixture
+    app.dependency_overrides[get_db] = override_get_db
     return app
 
 
