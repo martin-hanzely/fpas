@@ -47,7 +47,6 @@ async def test_read_nonexistent(client: AsyncClient) -> None:
     assert response.status_code == 404
 
 
-# TODO
 @pytest.mark.asyncio
 async def test_update(client: AsyncClient, test_item: Item) -> None:
     item_update = ItemUpdate(name="Test Item 2")
@@ -60,7 +59,6 @@ async def test_update(client: AsyncClient, test_item: Item) -> None:
     assert item["name"] == item_update.name
 
 
-# TODO
 @pytest.mark.filterwarnings("ignore:.*transaction already deassociated from connection")
 @pytest.mark.asyncio
 async def test_update_duplicate(client: AsyncClient, test_item: Item) -> None:
@@ -81,7 +79,6 @@ async def test_delete(client: AsyncClient, test_item: Item) -> None:
     assert len(items) == 0
 
 
-# TODO
 @pytest.mark.asyncio
 async def test_delete_nonexistent(client: AsyncClient) -> None:
     response = await client.delete("/items/1")
