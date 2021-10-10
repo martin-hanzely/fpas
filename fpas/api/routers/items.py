@@ -15,11 +15,10 @@ router = APIRouter()
 
 @router.get("/", response_model=list[schemas.Item])
 async def read(*, db: AsyncSession = Depends(deps.get_db)) -> Any:
-    items = await crud.item.read(db=db)
-    return items
+    return await crud.item.read(db=db)
 
 
-@router.get("/{id}", response_model=schemas.Item)
+@router.get("/{item_id}", response_model=schemas.Item)
 async def read_one(*, item: Item = Depends(deps.get_item)) -> Any:
     return item
 
@@ -28,11 +27,11 @@ async def read_one(*, item: Item = Depends(deps.get_item)) -> Any:
 async def create(*, db: AsyncSession = Depends(deps.get_db), obj: schemas.ItemCreate) -> Any:
     try:
         return await crud.item.create(db=db, obj=obj)
-    except IntegrityError as e:
-        raise HTTPException(HTTP_400_BAD_REQUEST, e)
+    except IntegrityError:
+        raise HTTPException(HTTP_400_BAD_REQUEST, "Item with given name already exists.")
 
 
-@router.put("/{id}", response_model=schemas.Item)
+@router.put("/{item_id}", response_model=schemas.Item)
 async def update(
     *,
     db: AsyncSession = Depends(deps.get_db),
@@ -41,11 +40,11 @@ async def update(
 ) -> Any:
     try:
         return await crud.item.update(db=db, id=item.id, obj=obj)
-    except IntegrityError as e:
-        raise HTTPException(HTTP_400_BAD_REQUEST, e)
+    except IntegrityError:
+        raise HTTPException(HTTP_400_BAD_REQUEST, "Item with given name already exists.")
 
 
-@router.delete("/{id}", response_model=schemas.Item)
+@router.delete("/{item_id}", response_model=schemas.Item)
 async def delete(
     *, db: AsyncSession = Depends(deps.get_db), item: Item = Depends(deps.get_item)
 ) -> Any:
