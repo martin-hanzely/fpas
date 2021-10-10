@@ -16,6 +16,7 @@ async def test_create(client: AsyncClient) -> None:
     assert "id" in item
 
 
+@pytest.mark.filterwarnings("ignore:.*transaction already deassociated from connection")
 @pytest.mark.asyncio
 async def test_create_duplicate(client: AsyncClient, test_item: Item) -> None:
     item_create = ItemCreate(name=test_item.name)
@@ -60,6 +61,7 @@ async def test_update(client: AsyncClient, test_item: Item) -> None:
 
 
 # TODO
+@pytest.mark.filterwarnings("ignore:.*transaction already deassociated from connection")
 @pytest.mark.asyncio
 async def test_update_duplicate(client: AsyncClient, test_item: Item) -> None:
     item_2 = ItemCreate(name="Test Item 2")

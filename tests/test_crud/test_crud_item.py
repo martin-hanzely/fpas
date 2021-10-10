@@ -15,6 +15,7 @@ async def test_create_item(get_db: AsyncSession) -> None:
     assert item.name == item_in.name
 
 
+@pytest.mark.filterwarnings("ignore:.*transaction already deassociated from connection")
 @pytest.mark.asyncio
 async def test_create_duplicate_item(get_db: AsyncSession, test_item: Item) -> None:
     with pytest.raises(IntegrityError):
