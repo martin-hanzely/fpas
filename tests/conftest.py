@@ -1,4 +1,5 @@
 import asyncio
+from asyncio.events import AbstractEventLoop
 from typing import AsyncGenerator, Generator
 
 import pytest
@@ -24,7 +25,7 @@ def migration() -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope="session")
-def event_loop(request):
+def event_loop() -> Generator[AbstractEventLoop, None, None]:
     """
     Redefined event_loop fixture for pytest-asyncio to support session scoped coroutines.
     """

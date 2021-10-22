@@ -5,16 +5,16 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.types import DateTime
 
 
-class utcnow(functions.FunctionElement):
-    type = DateTime  # type: ignore[assignment]
+class utcnow(functions.FunctionElement[DateTime]):
+    type = DateTime
 
 
 @compiles(utcnow, "postgresql")
-def pg_utcnow(element, compiler, **kw):
+def pg_utcnow(element, compiler, **kw):  # type: ignore[no-untyped-def]
     return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
 
 
-def async_postgres_dsn(dsn: str):
+def async_postgres_dsn(dsn: str) -> str:
     """
     Replace DSN scheme with "postgresql+asyncpg" compatible with SqlAlchemy async API.
     """

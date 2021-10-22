@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from fpas.db.utils import async_postgres_dsn
@@ -18,5 +20,5 @@ from fpas.db.utils import async_postgres_dsn
         )
     ]
 )
-def test_async_postgres_dsn(input: str, expected_output: str):
+def test_async_postgres_dsn(input: str, expected_output: str) -> Any:
     async_postgres_dsn(input) == expected_output

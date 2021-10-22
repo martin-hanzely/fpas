@@ -29,7 +29,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return result.scalar_one_or_none()
 
     async def create(self, db: AsyncSession, *, obj: CreateSchemaType) -> ModelType:
-        obj_dict: dict = jsonable_encoder(obj, exclude_unset=True)
+        obj_dict: dict[str, Any] = jsonable_encoder(obj, exclude_unset=True)
         db_obj = self._model(**obj_dict)  # type: ignore[call-arg]
         db.add(db_obj)
         await db.commit()
@@ -40,7 +40,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         cursor = await db.execute(select(self._model).where(self._model.id == id))
         # raises exception if number of results is not equal to one
         db_obj = cursor.scalar_one()
-        obj_dict: dict = jsonable_encoder(obj, exclude_unset=True)
+        obj_dict: dict[str, Any] = jsonable_encoder(obj, exclude_unset=True)
         for k, v in obj_dict.items():
             setattr(db_obj, k, v)
         await db.commit()

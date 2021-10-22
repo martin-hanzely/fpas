@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -14,7 +16,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=RootResponseMessage)
-async def root():
+async def root() -> Any:
     return RootResponseMessage()
 
 
